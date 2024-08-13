@@ -242,7 +242,7 @@ class WebscrapeSpider(scrapy.Spider):
                 "notes": notes
             }
         return {}
-
+    
     def parse_levels_dropoff(self, data):
         level_data = {
             '0': {'drop_rate': None},
@@ -250,46 +250,29 @@ class WebscrapeSpider(scrapy.Spider):
             '50': {'remain_rate': None},
             '100': {'remain_rate': None}
         }
-
+        
         for item in data:
             level = item.get("level")
             if level in level_data:
                 if 'drop_rate' in item:
-                    try:
-                        drop_rate = float(item.get("drop_rate", float('nan')))
-                        if not math.isnan(drop_rate):
-                            level_data[level]['drop_rate'] = drop_rate
-                    except ValueError:
-                        pass
+                    level_data[level]['drop_rate'] = item.get("drop_rate")
                 if 'remain_rate' in item:
-                    try:
-                        remain_rate = float(item.get("remain_rate", float('nan')))
-                        if not math.isnan(remain_rate):
-                            level_data[level]['remain_rate'] = remain_rate
-                    except ValueError:
-                        pass
+                    level_data[level]['remain_rate'] = item.get("remain_rate")
 
         return level_data
-
+    
     def parse_engagement_time(self, data):
         engagement_time = [
-            float(item.get("avg_engagement_time_per_dau", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("avg_engagement_time_per_dau", float('nan')))) and float(item.get("avg_engagement_time_per_dau", 0)) > 0
+            item.get("avg_engagement_time_per_dau") for item in data if item.get("avg_engagement_time_per_dau", 0) > 0 
         ]
         avg_engagement_time = sum(engagement_time) / len(engagement_time) if engagement_time else 0
-
         new_users_engagement_time = [
-            float(item.get("avg_engagement_time_per_dau_new_users", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("avg_engagement_time_per_dau_new_users", float('nan')))) and float(item.get("avg_engagement_time_per_dau_new_users", 0)) > 0
+            item.get("avg_engagement_time_per_dau_new_users") for item in data if item.get("avg_engagement_time_per_dau_new_users", 0) > 0
         ]
         avg_new_users_engagement_time = sum(new_users_engagement_time) / len(new_users_engagement_time) if new_users_engagement_time else 0
 
-        old_users_engagement_time = [
-            float(item.get("avg_engagement_time_per_dau_old_users", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("avg_engagement_time_per_dau_old_users", float('nan')))) and float(item.get("avg_engagement_time_per_dau_old_users", 0)) > 0
+        old_users_engagement_time= [
+            item.get("avg_engagement_time_per_dau_old_users") for item in data if item.get("avg_engagement_time_per_dau_old_users", 0) > 0
         ]
         avg_old_users_engagement_time = sum(old_users_engagement_time) / len(old_users_engagement_time) if old_users_engagement_time else 0
 
@@ -299,25 +282,20 @@ class WebscrapeSpider(scrapy.Spider):
             "avg_old_users_engagement_time": avg_old_users_engagement_time
         }
 
+
     def parse_day_show_inters(self, data):
         impressions_per_dau = [
-            float(item.get("impressions_per_dau", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("impressions_per_dau", float('nan')))) and float(item.get("impressions_per_dau", 0)) > 0
+            item.get("impressions_per_dau") for item in data if item.get("impressions_per_dau", 0) > 0
         ]
         avg_impressions_per_dau = sum(impressions_per_dau) / len(impressions_per_dau) if impressions_per_dau else 0
 
         new_users_impressions = [
-            float(item.get("new_users_impressions_per_dau", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("new_users_impressions_per_dau", float('nan')))) and float(item.get("new_users_impressions_per_dau", 0)) > 0
+            item.get("new_users_impressions_per_dau") for item in data if item.get("new_users_impressions_per_dau", 0) > 0
         ]
         avg_new_users_impressions = sum(new_users_impressions) / len(new_users_impressions) if new_users_impressions else 0
 
         old_users_impressions = [
-            float(item.get("old_users_impressions_per_dau", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("old_users_impressions_per_dau", float('nan')))) and float(item.get("old_users_impressions_per_dau", 0)) > 0
+            item.get("old_users_impressions_per_dau") for item in data if item.get("old_users_impressions_per_dau", 0) > 0
         ]
         avg_old_users_impressions = sum(old_users_impressions) / len(old_users_impressions) if old_users_impressions else 0
 
@@ -329,23 +307,17 @@ class WebscrapeSpider(scrapy.Spider):
 
     def parse_day_rewarded_video(self, data):
         reward_impressions_per_dau = [
-            float(item.get("impressions_per_dau", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("impressions_per_dau", float('nan')))) and float(item.get("impressions_per_dau", 0)) > 0
+            item.get("impressions_per_dau") for item in data if item.get("impressions_per_dau", 0) > 0
         ]
         avg_reward_impressions_per_dau = sum(reward_impressions_per_dau) / len(reward_impressions_per_dau) if reward_impressions_per_dau else 0
 
         new_users_reward_impressions = [
-            float(item.get("new_users_impressions_per_dau", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("new_users_impressions_per_dau", float('nan')))) and float(item.get("new_users_impressions_per_dau", 0)) > 0
+            item.get("new_users_impressions_per_dau") for item in data if item.get("new_users_impressions_per_dau", 0) > 0
         ]
         avg_new_users_reward_impressions = sum(new_users_reward_impressions) / len(new_users_reward_impressions) if new_users_reward_impressions else 0
 
         old_users_reward_impressions = [
-            float(item.get("old_users_impressions_per_dau", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("old_users_impressions_per_dau", float('nan')))) and float(item.get("old_users_impressions_per_dau", 0)) > 0
+            item.get("old_users_impressions_per_dau") for item in data if item.get("old_users_impressions_per_dau", 0) > 0
         ]
         avg_old_users_reward_impressions = sum(old_users_reward_impressions) / len(old_users_reward_impressions) if old_users_reward_impressions else 0
 
@@ -357,25 +329,19 @@ class WebscrapeSpider(scrapy.Spider):
 
     def parse_total_revenue_date(self, data):
         iap_revenue = [
-            float(item.get("iap_revenue", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("iap_revenue", float('nan')))) and float(item.get("iap_revenue", 0)) > 0
+            item.get("iap_revenue") for item in data if item.get("iap_revenue", 0) > 0
         ]
         avg_iap_revenue = sum(iap_revenue) / len(iap_revenue) if iap_revenue else 0
         return {"iap_rev": avg_iap_revenue}
 
     def parse_average_revenue(self, data):
         paying_users = [
-            float(item.get("paying_users", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("paying_users", float('nan')))) and float(item.get("paying_users", 0)) > 0
+            item.get("paying_users") for item in data if item.get("paying_users", 0) > 0
         ]
         avg_paying_users = sum(paying_users) / len(paying_users) if paying_users else 0
 
         arppu = [
-            float(item.get("arppu", float('nan')))
-            for item in data
-            if not math.isnan(float(item.get("arppu", float('nan')))) and float(item.get("arppu", 0)) > 0
+            item.get("arppu") for item in data if item.get("arppu", 0) > 0
         ]
         avg_arppu = sum(arppu) / len(arppu) if arppu else 0
 
@@ -383,7 +349,6 @@ class WebscrapeSpider(scrapy.Spider):
             "PU": avg_paying_users,
             "ARPPU": avg_arppu
         }
-
     def parse_retention_rate(self, data):
         total_d0_for_d1 = 0
         total_d1 = 0
@@ -392,23 +357,24 @@ class WebscrapeSpider(scrapy.Spider):
 
         for item in data:
             metric_value = item.get('metricValue', {})
-            d0 = float(metric_value.get('d0', float('nan')))
-            d1 = float(metric_value.get('d1', float('nan')))
-            d7 = float(metric_value.get('d7', float('nan')))
+            d0 = metric_value.get('d0', 0)
+            d1 = metric_value.get('d1', 0)
+            d7 = metric_value.get('d7', 0)
 
-            if not math.isnan(d1) and d1 > 0:
+            if d1 > 0:
                 total_d1 += d1
                 total_d0_for_d1 += d0
-
-            if not math.isnan(d7) and d7 > 0:
+            
+            if d7 > 0:
                 total_d7 += d7
                 total_d0_for_d7 += d0
 
-        avg_d0_for_d1 = total_d1 / total_d0_for_d1 if total_d1  > 0 else 0
-        avg_d0_for_d7 = total_d7 / total_d0_for_d1 if total_d7 > 0 else 0
+        avg_rr_d1 = (total_d1 / total_d0_for_d1) if total_d0_for_d1 > 0 else 0
+        avg_rr_d7 = (total_d7 / total_d0_for_d7) if total_d0_for_d7 > 0 else 0
 
         return {
-            'avg_rr_d1': avg_d0_for_d1,
-            'avg_rr_d7': avg_d0_for_d7
+            'avg_rr_d1': avg_rr_d1,
+            'avg_rr_d7': avg_rr_d7
         }
+
 
