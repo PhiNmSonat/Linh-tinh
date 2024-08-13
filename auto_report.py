@@ -404,8 +404,8 @@ class WebscrapeSpider(scrapy.Spider):
                 total_d7 += d7
                 total_d0_for_d7 += d0
 
-        avg_d0_for_d1 = total_d0_for_d1 / total_d1 if total_d1 > 0 else 0
-        avg_d0_for_d7 = total_d0_for_d7 / total_d7 if total_d7 > 0 else 0
+        avg_d0_for_d1 = total_d1 / total_d0_for_d1 if total_d1  > 0 else 0
+        avg_d0_for_d7 = total_d7 / total_d0_for_d1 if total_d7 > 0 else 0
 
         return {
             'avg_rr_d1': avg_d0_for_d1,
