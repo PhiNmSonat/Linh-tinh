@@ -111,7 +111,8 @@ class WebscrapeSpider(scrapy.Spider):
                     'France': 'FR',
                     'Russia': 'RU',
                     'Belgium': 'BE',
-                    'Brazil': 'BR'
+                    'Brazil': 'BR',
+                    'Taiwan': 'TW',
                 }
 
                 if country is None:
