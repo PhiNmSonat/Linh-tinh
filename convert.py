@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import os
+import openpyxl
 
 def convert_json_to_excel(json_file, excel_file):
     # Read JSON data
@@ -38,7 +39,8 @@ def convert_json_to_excel(json_file, excel_file):
                 "RR D1": values.get("avg_rr_d1", ""),
                 "RR D7": values.get("avg_rr_d7", ""),
                 "PU": values.get("PU", ""),
-                "ARPPU": values.get("ARPPU", "")
+                "ARPPU": values.get("ARPPU", ""),
+                "Pay rate": values.get("pay_rate", "")
             }
             rows.append(row)
 
