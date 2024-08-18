@@ -1,5 +1,3 @@
-
-
 import math
 import scrapy
 import json
@@ -20,10 +18,11 @@ class WebscrapeSpider(scrapy.Spider):
         "apps/release",
         "levels/dropoff",
         "engagement/engagement-time",
+        "engagement/level-app-remove",
         "monetization/day-show-inters",
         "monetization/day-rewarded-video",
         "monetization/total-revenue-date",
-        "monetization/average-revenue"
+        "monetization/average-revenue",
     ]
 
     # Load configuration from config.json
@@ -113,6 +112,13 @@ class WebscrapeSpider(scrapy.Spider):
                     'Belgium': 'BE',
                     'Brazil': 'BR',
                     'Taiwan': 'TW',
+                    "Argentina": "AR",
+                    "Thailand": "TH",
+                    "Indonesia": "ID",
+                    "Canada": "CA",
+                    "New Zealand": "NZ",
+                    "Switzerland": "CH",
+                    "Australia": "AU"
                 }
 
                 if country is None:
@@ -152,7 +158,13 @@ class WebscrapeSpider(scrapy.Spider):
                     results['appId'] = app_id
 
                     # Save calculation results to output.json
-                    self.save_calculation_results(results, country, app_id)  # Added app_id here
+                    self.save_calculation_results(results, country, app_id)
+                    
+                    ###################
+                    # Save the response JSON
+                    # self.save_response_json(results, app_id, country, path)
+                    ######################
+
                 else:
                     self.logger.error("Unexpected JSON format.")
             except json.JSONDecodeError:
@@ -170,25 +182,48 @@ class WebscrapeSpider(scrapy.Spider):
                 country = response.meta.get('country', 'Global')  # Changed 'global' to 'Global' for consistency
                 app_id = response.meta['appId']  # Changed from app_Id to app_id for consistency
 
+                #########
+                path = response.meta['path']
+
                 # Perform calculations
                 retention_rates = self.parse_retention_rate(data)
                 retention_rates['appId'] = app_id
 
-                # Save calculations to a separate file
-                self.save_calculation_results(retention_rates, country, app_id)  # Added app_id here
+                # Save calculations
+                self.save_calculation_results(retention_rates, country, app_id)
+
+                ###############
+                # Save respone to json:
+                # self.save_response_json(retention_rates, app_id, country, path)
 
             except json.JSONDecodeError:
                 self.logger.error("Failed to decode JSON. Response body might not be valid JSON.")
                 self.logger.info(f"Response body: {response.text}")
 
+#######################
+
+    def save_response_json(self, data, app_id, country, path):
+        if not os.path.exists('data'):
+            os.makedirs('data')
+        if country is None:
+            country = "global"
+        path_name = path.split("/")[-1].replace("-", "_")  # Handle slashes in paths
+        filename = f"{app_id}_{country}_{path_name}.json"
+        file_path = os.path.join('data', filename)
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=4)
+        self.logger.info(f"Saved response JSON to {file_path}")
+######################
 
 
     def perform_calculations(self, path, data):
         # Perform calculations based on the path and return results
         if path == "apps/release":
             return self.parse_app_release(data)
-        if path == "engagement/engagement-time":
+        elif path == "engagement/engagement-time":
             return self.parse_engagement_time(data)
+        elif path == "engagement/level-app-remove":
+            return self.parse_levels_app_remove(data)
         elif path == "levels/dropoff":
             return self.parse_levels_dropoff(data)
         elif path == "engagement/engagement-time":
@@ -282,7 +317,18 @@ class WebscrapeSpider(scrapy.Spider):
             "avg_new_users_engagement_time": avg_new_users_engagement_time,
             "avg_old_users_engagement_time": avg_old_users_engagement_time
         }
-
+    
+    def parse_levels_app_remove(self, data):
+        remove_rate_level_1 = None
+        
+        for item in data:
+            level = item.get("level")
+            if level == "1":
+                remove_rate_level_1 = item.get("remove_per_start")
+                break
+        return {
+            "remove_level_1" : remove_rate_level_1
+        }
 
     def parse_day_show_inters(self, data):
         impressions_per_dau = [
@@ -346,10 +392,16 @@ class WebscrapeSpider(scrapy.Spider):
         ]
         avg_arppu = sum(arppu) / len(arppu) if arppu else 0
 
+        pay_rate = [
+            item.get("pay_rate") for item in data if item.get("pay_rate", 0) > 0
+        ]
+        avg_pay_rate = sum(pay_rate)/ len(pay_rate) if pay_rate else 0
+
         return {
             "PU": avg_paying_users,
-            "ARPPU": avg_arppu
-        }
+            "ARPPU": avg_arppu,
+            "pay_rate": avg_pay_rate
+            }
     def parse_retention_rate(self, data):
         total_d0_for_d1 = 0
         total_d1 = 0
@@ -377,5 +429,3 @@ class WebscrapeSpider(scrapy.Spider):
             'avg_rr_d1': avg_rr_d1,
             'avg_rr_d7': avg_rr_d7
         }
-
-

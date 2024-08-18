@@ -1,5 +1,3 @@
-
-
 import json
 import pandas as pd
 import os
@@ -30,6 +28,7 @@ def convert_json_to_excel(json_file, excel_file):
                 "Last Update": last_update,
                 "engagement time": engagement_time,
                 "level 0 drop rate": values.get("0", {}).get("drop_rate", ""),
+                "Remove Level 1": values.get("remove_level_1",""),
                 "level 20 remain rate": values.get("20", {}).get("remain_rate", ""),
                 "level 50 remain rate": values.get("50", {}).get("remain_rate", ""),
                 "level 100 remain rate": values.get("100", {}).get("remain_rate", ""),
@@ -54,6 +53,3 @@ def convert_json_to_excel(json_file, excel_file):
 
 # Example usage
 convert_json_to_excel('output.json', 'output.xlsx')
-
-
-
