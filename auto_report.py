@@ -382,20 +382,42 @@ class WebscrapeSpider(scrapy.Spider):
         return {"iap_rev": avg_iap_revenue}
 
     def parse_average_revenue(self, data):
+
+        #Check if the value is a number:
+        def safe_get(item, key):
+            value = item.get(key)
+            # Check if the value is a number and not NaN
+            return value if isinstance(value, (int, float)) and not math.isnan(value) else 0
+        
         paying_users = [
-            item.get("paying_users") for item in data if item.get("paying_users", 0) > 0
+            safe_get(item, "paying_users") for item in data if safe_get(item, "paying_users") > 0
         ]
         avg_paying_users = sum(paying_users) / len(paying_users) if paying_users else 0
 
         arppu = [
-            item.get("arppu") for item in data if item.get("arppu", 0) > 0
+            safe_get(item, "arppu") for item in data if safe_get(item, "arppu") > 0
         ]
         avg_arppu = sum(arppu) / len(arppu) if arppu else 0
 
         pay_rate = [
-            item.get("pay_rate") for item in data if item.get("pay_rate", 0) > 0
+            safe_get(item, "pay_rate") for item in data if safe_get(item, "pay_rate") > 0
         ]
-        avg_pay_rate = sum(pay_rate)/ len(pay_rate) if pay_rate else 0
+        avg_pay_rate = sum(pay_rate) / len(pay_rate) if pay_rate else 0
+
+        # paying_users = [
+        #     item.get("paying_users") for item in data if item.get("paying_users", 0) > 0
+        # ]
+        # avg_paying_users = sum(paying_users) / len(paying_users) if paying_users else 0
+
+        # arppu = [
+        #     item.get("arppu") for item in data if item.get("arppu", 0) > 0
+        # ]
+        # avg_arppu = sum(arppu) / len(arppu) if arppu else 0
+
+        # pay_rate = [
+        #     item.get("pay_rate") for item in data if item.get("pay_rate", 0) > 0
+        # ]
+        # avg_pay_rate = sum(pay_rate)/ len(pay_rate) if pay_rate else 0
 
         return {
             "PU": avg_paying_users,
