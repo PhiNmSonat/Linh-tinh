@@ -376,10 +376,10 @@ class WebscrapeSpider(scrapy.Spider):
 
     def parse_total_revenue_date(self, data):
         iap_revenue = [
-            item.get("iap_revenue") for item in data if item.get("iap_revenue", 0) > 0
+            item.get("iap_revenue_net") for item in data if item.get("iap_revenue_net", 0) > 0
         ]
         avg_iap_revenue = sum(iap_revenue) / len(iap_revenue) if iap_revenue else 0
-        return {"iap_rev": avg_iap_revenue}
+        return {"iap_revenue_net": avg_iap_revenue}
 
     def parse_average_revenue(self, data):
 
